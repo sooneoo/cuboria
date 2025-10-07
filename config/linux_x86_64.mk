@@ -17,7 +17,7 @@ LIBS += $$(pkg-config --libs $(PKGS))
 OBJS += $(CACHE)/main.o
 
 
-$(CACHE)/main.o: src/cuboria/main.c
+$(CACHE)/main.o: src/cuboria/main.c src/cuboria/version.h
 	$(CC) $(CFLAGS) -c src/cuboria/main.c -o $@
 
 
