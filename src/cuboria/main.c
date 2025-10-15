@@ -8,6 +8,8 @@
 #include "cuboria/game_state_game_control.h"
 
 
+
+
 typedef struct {
     GameState super;
 } GameState_Options;
@@ -99,9 +101,10 @@ static GameState* state_buff_mem[GameState_ID_N] = {
     , &state_game_over.super
 };
 
-GameManager game_manager_instance;
+static GameManager_Context context;
+static GameManager game_manager_instance;
 
-
+#define IMG "assets/img/"
 
 #include "version.h"
 
@@ -118,12 +121,33 @@ int main(void) {
 	SetTargetFPS(144);
     ToggleFullscreen();
 
+    Texture2D cube_texture = LoadTexture(IMG "cube_texture.png"); 
+
+
+    Camera3D camera = { 0 };
+    camera.position = (Vector3){ 0.0f, 10.0f, 10.0f };  // Camera position
+    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
+    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+    camera.fovy = 45.0f;                                // Camera field-of-view Y
+    camera.projection = CAMERA_PERSPECTIVE; 
+
+    Mesh cube_mesh = GenMeshCube(1.0f, 1.0f, 1.0f);
+    Model cube = LoadModelFromMesh(cube_mesh);
+    cube.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = cube_texture;
+
     state_menu = game_state_menu();
     state_options = game_state_options();
     state_game_control = game_state_game_control();
     state_pause = game_state_pause();
     state_game_over = game_state_game_over();
-	game_manager_instance = game_manager(&state_game_control.super, state_buff_mem);
+
+    context = (GameManager_Context) {
+        .camera = camera
+        , .state_stack = state_buff_mem
+        , .cube = cube
+    };
+
+	game_manager_instance = game_manager(&state_game_control.super, &context);
 
 
 	while(WindowShouldClose() == false) {
@@ -135,6 +159,8 @@ int main(void) {
 		EndDrawing();
 	}
 
+    UnloadModel(cube);
+    UnloadTexture(cube_texture);
 	CloseWindow();
 
 	return EXIT_SUCCESS;

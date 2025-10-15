@@ -21,6 +21,7 @@ typedef struct {
 	GameState ** state_stack;
     float frame_time;
 
+    Model cube;
     Camera3D camera;
 } GameManager_Context;
 

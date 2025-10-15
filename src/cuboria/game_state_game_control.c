@@ -7,7 +7,8 @@ static GameState * game_state_game_control_callback(
 
     UpdateCamera(&context->camera, CAMERA_FREE); 
     BeginMode3D(context->camera);
-    DrawCube((Vector3){ 0.0f, 0.0f, 0.0f }, 2.0f, 1.0f, 2.0f, RED); 
+    DrawModel(context->cube, (Vector3){ 0.0f, 0.0f, 0.0f }, 2.0f, WHITE);
+
     DrawGrid(10, 1.0f);
     EndMode3D();
 

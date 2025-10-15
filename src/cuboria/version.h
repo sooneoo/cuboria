@@ -10,7 +10,7 @@ typedef struct {
 
 #define cuboria_version() (Cuboria_Version) {   \
     .major = 0                                  \
-    , .minor = 2                                \
+    , .minor = 3                                \
     , .patch = 0                                \
 }
 

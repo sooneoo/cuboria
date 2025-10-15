@@ -5,12 +5,12 @@
 
 
 typedef struct {
-	GameManager_Context context;
+	GameManager_Context * context;
 	GameState * state;	
 } GameManager;
 
 
-GameManager game_manager(GameState * init_state, GameState ** state_stack);
+GameManager game_manager(GameState * init_state, GameManager_Context * context);
 
 
 void game_manager_execute(GameManager * self);
