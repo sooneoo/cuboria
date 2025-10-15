@@ -19,6 +19,23 @@ object GameManager {
     GameState* state
 }
 
+object Object {
+    void (*draw)(Object *)
+    void (*update)(Object*, float)
+}
+
+object Button {
+    void (*draw)(Button*)
+    void (*click_callback)(Button*, void *)
+    void * param
+}
+
+
+object Menu {
+    Object super
+}
+
+
 GameManager <|-- GameManager_Context
 GameManager_Context <|-- GameState_Menu
 GameManager_Context <|-- GameState_Pause
@@ -31,6 +48,11 @@ GameState_Pause <|-- GameState
 GameState_Options <|-- GameState
 GameState_GameControl <|-- GameState
 GameState_GameOver <|-- GameState
+
+Menu <|-- Object
+Menu <|-- Button
+
+GameState_Menu <|-- Menu
 
 @enduml
 

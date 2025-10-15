@@ -17,9 +17,7 @@ LIBS += $$(pkg-config --libs $(PKGS))
 OBJS += $(CACHE)/main.o
 OBJS += $(CACHE)/game_manager.o
 OBJS += $(CACHE)/game_state_menu.o
-OBJS += $(CACHE)/game_state_game_control.o
 OBJS += $(CACHE)/menu_button.o
-
 
 
 $(CACHE)/main.o: src/cuboria/main.c src/cuboria/version.h
@@ -34,18 +32,10 @@ $(CACHE)/game_state_menu.o: src/cuboria/game_state_menu.c src/cuboria/version.h
 	$(CC) $(CFLAGS) -c src/cuboria/game_state_menu.c -o $@
 
 
-$(CACHE)/game_state_game_control.o: src/cuboria/game_state_game_control.c src/cuboria/version.h
-	$(CC) $(CFLAGS) -c src/cuboria/game_state_game_control.c -o $@
-
-
 $(CACHE)/menu_button.o: src/cuboria/menu_button.c src/cuboria/version.h
 	$(CC) $(CFLAGS) -c src/cuboria/menu_button.c -o $@
 
 
 $(RELEASE)/$(TARGET): $(OBJS)
 	$(CC) $(OBJS) $(LIBS) -o $(RELEASE)/$(TARGET)
-
-
-
-
 

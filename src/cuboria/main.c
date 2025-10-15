@@ -3,56 +3,9 @@
 #include <stdbool.h>
 #include <raylib.h>
 
-
-typedef struct GameState GameState;
-
-
-typedef struct {
-	GameState ** state_stack;
-} GameManager_Context;
-
-
-typedef enum {
-    GameState_ID_Menu
-    , GameState_ID_Options
-    , GameState_ID_Pause
-    , GameState_ID_GameControl
-    , GameState_ID_GameOver
-    , GameState_ID_N
-} GameState_ID ;
-
-
-struct GameState {
-	struct GameState * (*callback)(struct GameState *, GameManager_Context *, float);
-};
-
-
-typedef struct {
-    GameState super;
-} GameState_Menu;
-
-
-#define GAME_STATE_MENU ((T)(GameState_Menu*))
-
-
-static GameState * game_state_menu_callback(
-        GameState * self, GameManager_Context * context, float frame_time) {
-    DrawText("Menu", 400, 300, 40, BLACK);
-    if(IsKeyPressed(KEY_SPACE) == true) {
-        return context->state_stack[GameState_ID_Options];        
-    } else {
-        return context->state_stack[GameState_ID_Menu];        
-    }
-}
-
-
-GameState_Menu game_state_menu(void) {
-    return (GameState_Menu) {
-        .super = {
-            .callback = game_state_menu_callback
-        }
-    };
-}
+#include "cuboria/game_manager.h"
+#include "cuboria/game_state_menu.h"
+#include "cuboria/game_state_game_control.h"
 
 
 typedef struct {
@@ -61,7 +14,7 @@ typedef struct {
 
 
 static GameState * game_state_options_callback(
-        GameState * self, GameManager_Context * context, float frame_time) {
+        GameState * self, GameManager_Context * context) {
     DrawText("Options", 400, 300, 40, BLACK);
     if(IsKeyPressed(KEY_SPACE) == true) {
         return context->state_stack[GameState_ID_GameControl];
@@ -86,7 +39,7 @@ typedef struct {
 
 
 static GameState * game_state_pause_callback(
-        GameState * self, GameManager_Context * context, float frame_time) {
+        GameState * self, GameManager_Context * context) {
     DrawText("Pause", 400, 300, 40, BLACK);
     if(IsKeyPressed(KEY_SPACE) == true) {
         return context->state_stack[GameState_ID_GameOver];
@@ -105,29 +58,6 @@ GameState_Pause game_state_pause(void) {
 }
 
 
-typedef struct {
-    GameState super;
-} GameState_GameControl;
-
-
-static GameState * game_state_game_control_callback(
-        GameState * self, GameManager_Context * context, float frame_time) {
-    DrawText("Game Control", 400, 300, 40, BLACK);
-    if(IsKeyPressed(KEY_SPACE) == true) {
-        return context->state_stack[GameState_ID_Pause];
-    } else {
-        return context->state_stack[GameState_ID_GameControl];
-    }
-}
-
-
-GameState_GameControl game_state_game_control(void) {
-    return (GameState_GameControl) {
-        .super = {
-            .callback = game_state_game_control_callback
-        }
-    };
-}
 
 
 typedef struct {
@@ -136,7 +66,7 @@ typedef struct {
 
 
 static GameState * game_state_game_over_callback(
-        GameState * self, GameManager_Context * context, float frame_time) {
+        GameState * self, GameManager_Context * context) {
     DrawText("Game Over", 400, 300, 40, BLACK);
     if(IsKeyPressed(KEY_SPACE) == true) {
         return context->state_stack[GameState_ID_Menu];
@@ -152,28 +82,6 @@ GameState_GameOver game_state_game_over(void) {
             .callback = game_state_game_over_callback
         }
     };
-}
-
-
-typedef struct {
-	GameManager_Context context;
-	GameState * state;	
-} GameManager;
-
-
-GameManager game_manager(GameState * init_state, GameState ** state_stack) {
-	return (GameManager) {
-		.context = {
-			.state_stack = state_stack
-		}
-		, .state = init_state
-	};
-}
-
-
-void game_manager_execute(GameManager * self) {
-	float frame_time = GetFrameTime();
-	self->state = self->state->callback(self->state, &self->context, frame_time);
 }
 
 
@@ -208,16 +116,18 @@ int main(void) {
 	InitWindow(800, 600, wtitle);
 	SetConfigFlags(FLAG_VSYNC_HINT);
 	SetTargetFPS(144);
+    ToggleFullscreen();
 
     state_menu = game_state_menu();
     state_options = game_state_options();
     state_game_control = game_state_game_control();
     state_pause = game_state_pause();
     state_game_over = game_state_game_over();
-	game_manager_instance = game_manager(&state_menu.super, state_buff_mem);
+	game_manager_instance = game_manager(&state_game_control.super, state_buff_mem);
 
 
 	while(WindowShouldClose() == false) {
+
 		BeginDrawing();
 		ClearBackground(WHITE);
         game_manager_execute(&game_manager_instance);
